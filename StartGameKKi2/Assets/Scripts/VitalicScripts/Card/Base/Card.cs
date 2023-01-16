@@ -11,7 +11,7 @@ using CardGame.Cards.Effects;
 namespace CardGame.Cards.Base
 {
     [RequireComponent(typeof(CanvasGroup))]
-    public class Card : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
+    public class Card : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler//, ICellEffect
     {
         [SerializeField] private ModelCard _model;
         private CanvasGroup _canvasGroup;
@@ -19,21 +19,26 @@ namespace CardGame.Cards.Base
         private Vector2 _startPosition;
         public bool IsCanDrag;
         public bool IsPointerEnTer;
-        private Player _owner;
+       [SerializeField] private Player _owner;
 
 
         private UiLineRender _lineRenderer;
 
-        private bool IsOpen = false;
+        [SerializeField] private bool IsOpen = false;
         private Unit _unit = null;
         private CardUnit _cardUnit = null;
+        private Effect _effect = null;
         private UpdaterPopap _popap;
 
         public UnityEvent ActionStart = new UnityEvent();
 
-        public UnityEvent ActionDead = new UnityEvent();
-        //Unit _unit = null;
+        public UnityEvent ActionRegulary = new UnityEvent();
 
+        public UnityEvent ActionFight = new UnityEvent(); 
+
+        public UnityEvent ActionDead = new UnityEvent();
+
+        //  public CellEffect Cell => CellEffect.Card;
 
         private void Awake()
         {
@@ -49,18 +54,22 @@ namespace CardGame.Cards.Base
             _popap = updaterPopap;
             ActionStart = model?.ActionStart;
             ActionDead = model?.ActionDead;
+            ActionRegulary = model.ActionRegulary;
 
             if (_model.TypeCard == TypeCard.Unit)
             {
                 _unit = gameObject.AddComponent<Unit>();
                 _cardUnit = gameObject.AddComponent<CardUnit>();
-                // var modelUnit = model as ModelUnit
                 _unit.Setup(_model as ModelUnit, player);
                 _cardUnit.Setup(_unit);
+             
             }
             else
             {
+                _effect = gameObject.AddComponent<Effect>();
 
+                var modelEffect = _model as ModelEffect;
+                _effect.Setup(modelEffect.CountCell, modelEffect.Cell, modelEffect.IsEnemy);
             }
         }
 
@@ -69,6 +78,15 @@ namespace CardGame.Cards.Base
             _lineRenderer = lineRender;
         }
 
+        public int GetCost() 
+        {
+            return _model.Price;
+        }
+
+        public string GetName() 
+        {
+            return _model.Name;
+        }
 
         public void CreatePricel()
         {
@@ -117,6 +135,10 @@ namespace CardGame.Cards.Base
             }
         }
 
+        public Effect GetEffect()
+        {
+            return _effect;
+        }
         public Unit GetUnit()
         {
             return _unit;
@@ -131,6 +153,10 @@ namespace CardGame.Cards.Base
         {
             return _owner;
         }
+        public void SetPlayer(Player player)
+        {
+            _owner = player;
+        }
         public UICard GetUICard()
         {
             return _uicard;
@@ -139,6 +165,11 @@ namespace CardGame.Cards.Base
         public TypeCard GetTypeCard()
         {
             return _model.TypeCard;
+        }
+
+        public CardClass GetClassCard() 
+        {
+            return _model.Class;
         }
 
         public void TogelIsCanDrag(bool flag)
@@ -171,33 +202,30 @@ namespace CardGame.Cards.Base
                         ObserverCard._instance.SetUnitPointEnter(_unit);
                     }
                 }
-                
+
             }
-
-
-            //transform.position = new Vector3(transform.position.x, transform.position.y + 50, transform.position.z);
-            //IsPointerEnTer = true;
         }
 
+        public void ResetCard()
+        {
+            _cardUnit.ResetCard();
+        }
 
         public void OnPointerExit(PointerEventData eventData)
         {
 
             _popap.OffPopap();
-            var unit =ObserverCard._instance.GetUnitPointEnter();
+            var unit = ObserverCard._instance.GetUnitPointEnter();
             if (unit != null)
             {
-                    unit.GetComponent<Card>().GetUICard().DeactivCard();
-                    var enemy = unit.GetEnemy();
+                unit.GetComponent<Card>().GetUICard().DeactivCard();
+                var enemy = unit.GetEnemy();
 
-                    if (enemy != null)
-                    {
-                        enemy.GetComponent<Card>().GetUICard().DeactivCard();
-                    }
-                //ObserverCard._instance.SetUnitPointEnter(null);
+                if (enemy != null)
+                {
+                    enemy.GetComponent<Card>().GetUICard().DeactivCard();
+                }
             }
-            //transform.position = new Vector3(transform.position.x, transform.position.y - 50, transform.position.z);
-            //IsPointerEnTer = false;
 
         }
 
@@ -211,6 +239,6 @@ namespace CardGame.Cards.Base
             }
 
         }
-            
+
     }
 }

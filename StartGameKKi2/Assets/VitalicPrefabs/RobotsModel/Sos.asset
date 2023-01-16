@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9d562f5c6f2ca14da753218902482b5, type: 3}
+  m_Name: Sos
+  m_EditorClassIdentifier: 
+  Name: "\u042D\u0444\u0444\u0435\u043A\u0442 \u0421\u041E\u0421"
+  Description: "\u041F\u0440\u0438\u0437\u044B\u0432\u0430\u0435\u0442 \u0434\u0432\u0443\u0445
+    \u0441\u043B\u0443\u0447\u0430\u0439\u043D\u044B\u0445 \u0440\u043E\u0431\u043E\u0442\u043E\u0432
+    \u0438\u0437 \u0432\u0430\u0448\u0435\u0439 \u043A\u043E\u043B\u043E\u0434\u044B.
+    \u042D\u0444\u0444\u0435\u043A\u0442 \u0421\u0442\u0430\u0440\u0442 \u043D\u0435\r\n\u0441\u0440\u0430\u0431\u043E\u0442\u0430\u0435\u0442."
+  SpriteCard: {fileID: 21300000, guid: 39990647105c49548b65cea4b400d1e9, type: 3}
+  Price: 4
+  TypeCard: 2
+  Class: 0
+  ActionStart:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 38585539619750035, guid: 93dec04e0a6d79349892559e5cdec726, type: 3}
+        m_TargetAssemblyTypeName: CardGame.Cards.Effects.EffectSos, Assembly-CSharp
+        m_MethodName: Call
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  ActionRegulary:
+    m_PersistentCalls:
+      m_Calls: []
+  ActionDead:
+    m_PersistentCalls:
+      m_Calls: []
+  ActionFight:
+    m_PersistentCalls:
+      m_Calls: []
+  CountCell: 0
+  Cell: 0
+  IsEnemy: 0

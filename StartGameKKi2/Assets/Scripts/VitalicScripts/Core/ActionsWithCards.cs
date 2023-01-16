@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Random = System.Random;
+//using Random = System.Random;
 
 using UnityEngine;
 
@@ -43,6 +43,17 @@ namespace CardGame.Core
 
 
      
+
+        public void MoveCard(Card card, Transform position) 
+        {
+            card.transform.parent = position;
+        }
+
+        
+     
+
+
+
 
 
         public void MoveCardToDumpFromHand(Card card)
@@ -99,6 +110,9 @@ namespace CardGame.Core
 
        
 
+        
+
+
         public void MoveCardsFromDeckToBoard(int count)
         {
             List<Card> unitCards = _inDeckCards.OfType<Card>().Take(count).ToList();
@@ -119,7 +133,7 @@ namespace CardGame.Core
                 _inDeckCards.Add(card);
             }
 
-            _inDeckCards = GetRandomDeck(_inDeckCards);
+            //_inDeckCards = GetRandomDeck(_inDeckCards);
         }
 
         public void AddCardsToHand()
@@ -146,6 +160,28 @@ namespace CardGame.Core
 
        
 
+        public void CardDeckMix() 
+        {
+
+            // var lstResult = _inDeckCards.OrderBy(x => Guid.NewGuid().ToString()).ToList();
+           
+            List<Card> listMix = new List<Card>();
+            int count = _inDeckCards.Count;
+            
+            for(int i = 0; i < count; i++) 
+            {
+                int rand = Random.Range(0, _inDeckCards.Count);
+                var card = _inDeckCards[rand];
+                _inDeckCards.Remove(card);
+                listMix.Add(card);
+            }
+            _inDeckCards.Clear();
+            foreach(var card in listMix) 
+            {
+                _inDeckCards.Add(card);
+            }
+        }
+
 
      
 
@@ -154,12 +190,12 @@ namespace CardGame.Core
             return _generatorGameBoard;
         }
 
-        private List<Card> GetRandomDeck(List<Card> deck)
+       /* public  List<Card> GetRandomDeck(List<Card> deck)
         {
-            Random random = new Random();
-            return deck.OrderBy(card => random.Next()).ToList();
+           // Random random = new Random();
+           // return deck.OrderBy(card => random.Next()).ToList();
         }
-
+       */
         public void BlockControl()
         {
             _inHandCards.ForEach(card => card.IsCanDrag = false);

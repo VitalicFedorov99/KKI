@@ -14,6 +14,7 @@ namespace CardGame.Ui
         [SerializeField] private Text _textClass;
         [SerializeField] private Text _textCost;
         [SerializeField] private GameObject _popap;
+        [SerializeField] private Text _textDescription;
         
 
 
@@ -26,6 +27,7 @@ namespace CardGame.Ui
             _textName.text = card.Name;
             _textClass.text = card.Class.ToString();
             _textCost.text = card.Price.ToString();
+            _textDescription.text = card.Description;
         }
 
         public void OffPopap() 

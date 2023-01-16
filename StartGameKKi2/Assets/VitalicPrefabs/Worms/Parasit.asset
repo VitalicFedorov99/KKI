@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc7ad059ca59f84aaff1d9c0226556f, type: 3}
+  m_Name: Parasit
+  m_EditorClassIdentifier: 
+  Name: "\u041F\u0430\u0440\u0430\u0437\u0438\u0442"
+  Description: "\u0412\u043E\u0441\u0441\u0442\u0430\u043D\u0430\u0432\u043B\u0438\u0432\u0430\u0435\u0442
+    \u0437\u0434\u043E\u0440\u043E\u0432\u044C\u0435, \u0440\u0430\u0432\u043D\u043E\u0435
+    \r\n\u043A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u0443 \u043D\u0430\u043D\u0435\u0441\u0451\u043D\u043D\u043E\u0433\u043E
+    \u0443\u0440\u043E\u043D\u0430."
+  SpriteCard: {fileID: 21300000, guid: dd9f27acf7e8a3b4ba342bc939310f48, type: 3}
+  Price: 3
+  TypeCard: 1
+  Class: 4
+  ActionStart:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6386599020473034305, guid: 24c29542dd22d314f8076941921d2497, type: 3}
+        m_TargetAssemblyTypeName: Vampirism, Assembly-CSharp
+        m_MethodName: AddVampirism
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  ActionRegulary:
+    m_PersistentCalls:
+      m_Calls: []
+  ActionDead:
+    m_PersistentCalls:
+      m_Calls: []
+  ActionFight:
+    m_PersistentCalls:
+      m_Calls: []
+  Health: 4
+  Damage: 2
+  CountCell: 0
+  Cell: 0
+  IsEnemy: 0
+  IsBlocked: 1

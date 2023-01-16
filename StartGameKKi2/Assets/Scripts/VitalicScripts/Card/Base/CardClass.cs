@@ -9,7 +9,8 @@ namespace CardGame.Cards.Base
         Non,
         Robot,
         Aquarium,
-        Dwarf
+        Dwarf,
+        Worms
     }
 }
 

@@ -10,9 +10,10 @@ namespace CardGame.Core
     {
 
         private Player _player;
+        [SerializeField] private int _step;
         private ActionsWithCards _actionsWithCards;
         private int counter = 0;
-        private GameObject _enemyObj;
+        [SerializeField] private GameObject _enemyObj;
         public void StartMove()
         {
             _actionsWithCards.AddCardsToHand();
@@ -22,17 +23,12 @@ namespace CardGame.Core
             {
                 _player.TakeDamage(1);
             }
+            _step++;
 
-            int addForceCount = Game.MoveNumber / 2 + Game.MoveNumber % 2;
-            if (addForceCount > 6)
-                addForceCount = 6;
-            _player.Force += Game.MoveNumber / 2 + Game.MoveNumber % 2;
-            if (_player.Force > 10)
-                _player.Force = 10;
-
-
-            // GoToDefendPhase(Game.Enemy);
+            _player.Force = 0;
+            _player.AddForce(2 * _step);
         }
+
         public void GoToDefendPhase()
         {
             _player.CurrentPhase = Phase.Defend;
@@ -50,15 +46,7 @@ namespace CardGame.Core
         public void GoToPlayCardPhase()
         {
             _player.CurrentPhase = Phase.Play;
-            /*_actionsWithCards._inBoardCards.ForEach(card =>
-            {
-                card.IsCanDrag = false;
-                if (card.GetUnit().Status != Status.FirstTurn && card.GetUnit().Status != Status.Defender)
-                    card.GetCardUnit().SetCannotAct();
-            });
-            _actionsWithCards._inHandCards.ForEach(card => card.IsCanDrag = true);
-            _actionsWithCards.GetGeneratorGameBoard().Generate(Game.CurrentPlayer.GetActionsWithCards(), Game.Enemy.GetActionsWithCards());
-            _actionsWithCards.DisableCards();*/
+
         }
 
         public void GoToAttackPhase()
@@ -70,13 +58,6 @@ namespace CardGame.Core
             }
             );
             _actionsWithCards._inHandCards.ForEach(card => card.IsCanDrag = false);
-            /*_actionsWithCards._inBoardCards.ForEach(card =>
-              {
-                  card.IsCanDrag = true;
-                  if (card.GetUnit().Status != Status.FirstTurn && card.GetUnit().Status != Status.Defender)
-                      card.GetCardUnit().SetCannotAct();
-              });
-            _actionsWithCards._inHandCards.ForEach(card => card.IsCanDrag = false);*/
         }
 
         public void GoToFight()
@@ -86,44 +67,64 @@ namespace CardGame.Core
             Game.CurrentPlayer.GetActionsWithCards()._inBoardCards.ForEach(t => t.GetComponent<LayoutElement>().ignoreLayout = true);
             Game.CurrentPlayer.GetActionsWithCards()._inDumpCards.ForEach(t => t.GetComponent<LayoutElement>().ignoreLayout = true);
             counter = 0;
-            StartCoroutine(Fight());
+            if (_actionsWithCards._inBoardCards.Count > 0)
+                StartCoroutine(Fight());
         }
 
-        public void SetEnemyObject(GameObject objEnemy) 
+        public void SetEnemyObject(GameObject objEnemy)
         {
             _enemyObj = objEnemy;
         }
 
 
+        public int GetStep()
+        {
+            return _step;
+        }
+
         IEnumerator Fight()
         {
+
             Unit unit = _actionsWithCards._inBoardCards[counter].GetUnit();
+            if (unit.GetEnemyPlayer() == null)
+            {
+                unit.SetEnemyPlayer(Game.CurrentPlayer);
+            }
+
+
+
             if (unit.Status == Status.Attacker)
             {
                 if (unit.GetEnemy() != null)
                 {
                     Twinner._instance.Attack(unit.GetComponent<RectTransform>(), unit.GetEnemy().GetComponent<RectTransform>());
-                    Debug.LogError("Пошел бой");
                     yield return new WaitForSeconds(2f);
                     unit.TakeDamage(unit.GetEnemy().Damage);
                     unit.GetEnemy().TakeDamage(unit.Damage);
                 }
-                else 
+                else
                 {
+                    _enemyObj = Game.Generator.GetHero(unit.GetEnemyPlayer().PlayerType);
+                    unit.GetEnemyPlayer().TakeDamage(unit.Damage);
                     Twinner._instance.AttackInHero(unit.GetComponent<RectTransform>(), _enemyObj.GetComponent<RectTransform>());
-                    Debug.LogError("Пошел бой");
                     yield return new WaitForSeconds(2f);
 
                 }
-
+                _actionsWithCards._inBoardCards[counter].ActionFight?.Invoke();
                 _actionsWithCards._inBoardCards[counter].GetComponent<CardUnit>().Attack();
+                if (unit.GetEnemy() != null)
+                {
+                    unit.GetEnemy().SetEnemy(null);
+                }
+                unit.SetEnemy(null);
             }
+
             counter++;
-            if(counter < _actionsWithCards._inBoardCards.Count) 
+            if (counter < _actionsWithCards._inBoardCards.Count)
             {
                 StartCoroutine(Fight());
             }
-            else 
+            else
             {
                 _actionsWithCards._inBoardCards.ForEach(t => t.GetComponent<LayoutElement>().ignoreLayout = false);
                 _actionsWithCards._inDumpCards.ForEach(t => t.GetComponent<LayoutElement>().ignoreLayout = false);

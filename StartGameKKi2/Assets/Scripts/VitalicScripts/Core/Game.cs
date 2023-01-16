@@ -17,28 +17,30 @@ namespace CardGame.Core
         [SerializeField] private UpdateForceHealthPanel _updateForceHealthPanel; 
 
         private GeneratorGameBoard _generatorGameBoard;
+        [SerializeField] private ObserverRound _observerRound;
+        [SerializeField] private TurnStatusUI _turnStatus;
+       
 
         private static int _moveNumber = 0;
         public static int MoveNumber => _moveNumber;
 
         public static Player CurrentPlayer;
         public static Player Enemy;
-        public static GeneratorGameBoard Generator; 
-
+        public static GeneratorGameBoard Generator;
+        public static ObserverRound Observer;
 
         public UnityEvent moveEnded;
-        public UnityEvent<int> turnNumberChanged;
+        //public UnityEvent<int> turnNumberChanged;
         public UnityEvent playerChanged;
         public UnityEvent<Player> gameOver;
 
         private void Awake()
         {
-
+            Time.timeScale = 1;
             _generatorGameBoard = GetComponent<GeneratorGameBoard>();
-            /* _player1.moveEnded.AddListener(NextMove);
-             _player2.moveEnded.AddListener(NextMove);
-             _player1.died.AddListener(() => Win(_player2));
-             _player2.died.AddListener(() => Win(_player1));*/
+            _observerRound = GetComponent<ObserverRound>();
+            _observerRound.Setup();
+            Observer = _observerRound;
             _generatorGameBoard.StartGame(_player1.GetActionsWithCards(), _player2.GetActionsWithCards());
             Generator = _generatorGameBoard;
             CurrentPlayer = _player1;
@@ -46,57 +48,25 @@ namespace CardGame.Core
             _moveNumber++;
             UpdateEventPlayer();
             FirstPhase();
+            _turnStatus.OnUpdate(1);
         }
 
         public void NextPlayer() 
         {
-            _generatorGameBoard.Generate(CurrentPlayer.GetActionsWithCards(),Enemy.GetActionsWithCards());
             UpdateEventPlayer();
             FirstPhase();
-
+            _observerRound.CallStartStep(CurrentPlayer.PlayerType);
         }
 
-        public void NextMove()
-        {
-            _moveNumber++;
-
-            if (_moveNumber % 2 == 0)
-            {
-                CurrentPlayer = _player2;
-                Enemy = _player1;
-            }
-            else
-            {
-                CurrentPlayer = _player1;
-                Enemy = _player2;
-            }
-
-            playerChanged?.Invoke();
-
-            CurrentPlayer.GetPlayerActions().StartMove();
-
-            CurrentPlayer.UpdateValues();
-            Enemy.UpdateValues();
-            _generatorGameBoard.Generate(CurrentPlayer.GetActionsWithCards(), Enemy.GetActionsWithCards());
-            turnNumberChanged?.Invoke(_moveNumber / 2 + _moveNumber % 2);
-
-            #region LOG
-            if (_moveNumber <= 2)
-                Debug.Log($"Привет, {CurrentPlayer.name}\n" +
-                          "Добро пожаловать в ход №1 \n" +
-                          "На первом ходу есть только фаза розыгрыша карт, поэтому фазу защиты пропускаем нажав кнопку Защита готова" +
-                          "(выбери карту с руки и перетяни ее на поле в синюю зону, цена выбранной карты не может превышать Мощь)");
-
-            if (_moveNumber > 2 && _moveNumber <= 4)
-                Debug.Log($"{CurrentPlayer.name}: В следующий ход Вы сможете назначить ОДНУ карту на боевом поле для защиты от атаки соперника. Сейчас пропустите эту фазу (Он Вас не атаковал). Нажмите кнопку Защита готова");
-            #endregion
-        }
+       
+       
 
 
 
         public void FirstPhase() 
         {
-            CurrentPlayer.AppForce(MoveNumber);
+
+            CurrentPlayer.GetPlayerActions().StartMove();
             CurrentPlayer.GetPlayerActions().GoToPlayCardPhase();
             CurrentPlayer.UpdateValues();
             Enemy.UpdateValues();
@@ -104,34 +74,18 @@ namespace CardGame.Core
             CurrentPlayer.GetActionsWithCards().CardsCanAct();
         }
 
-        public void Defend()
-        {
-           // Enemy.GetPlayerActions().Attack(CurrentPlayer);
-            CurrentPlayer.GetPlayerActions().GoToPlayCardPhase();
-            #region LOG
-            if (_moveNumber > 2 && _moveNumber <= 4)
-                Debug.Log($"{CurrentPlayer.name}: Разыграйте карты с руки если хотите. (этого можно не делать, если у Вас есть коварный план поднакопить мощи). Когда закончите нажмите кнопку К атаке");
-            #endregion
-        }
+      
 
+        public void FightPhase() 
+        {
+            CurrentPlayer.GetPlayerActions().GoToAttackPhase();
+        }
 
         public void Fight() 
         {
             Enemy.GetPlayerActions().GoToFight();
         }
 
-       
-        public void EndPlayCardPhase()
-        {
-           
-            CurrentPlayer.GetPlayerActions().GoToAttackPhase();
-            #region LOG
-            if (_moveNumber <= 2)
-                Debug.Log("На первом ходу Игроки не могут атаковать противника. Уступите стул сопернику. (Нажмите Закончить)");
-            if (_moveNumber > 2 && _moveNumber <= 4)
-                Debug.Log($"{CurrentPlayer.name}: Назначьте атакующего если хотите и нажмите и нажмите Завершить ход. После этого уступите место сопернику");
-            #endregion
-        }
 
         public void EndAttackPhase() 
         {
@@ -153,6 +107,7 @@ namespace CardGame.Core
             CurrentPlayer.UpdateValues();
             Enemy.UpdateValues();
             CurrentPlayer.GetPlayerActions().GoToDefendPhase();
+            _turnStatus.OnUpdate(CurrentPlayer.GetPlayerActions().GetStep()+1);
             //ьтCurrentPlayer.GetActionsWithCards().
         }
 

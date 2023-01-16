@@ -109,6 +109,11 @@ namespace CardGame.Cards
         }
 
 
+        public void UpdateDamage(int damage) 
+        {
+            _damageText.text = damage.ToString();
+        }
+
 
 
         public void OnAttackStatus()

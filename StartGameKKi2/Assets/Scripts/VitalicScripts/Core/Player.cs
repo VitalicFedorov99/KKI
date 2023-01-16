@@ -13,6 +13,7 @@ namespace CardGame.Core
 {
     public class Player : MonoBehaviour
     {
+        public PlayerType PlayerType;
         public Phase CurrentPhase { get; set; }
 
         public int CurrentHealth => _currentHealth;
@@ -20,7 +21,7 @@ namespace CardGame.Core
 
 
 
-
+        [SerializeField] private EndGame _endGame;
         [SerializeField] private int _health = 15;
         [SerializeField] private int _maxCountCard = 5;
 
@@ -35,20 +36,19 @@ namespace CardGame.Core
 
         
 
-        public void TakeDamage(int damage)// добавить твин ранения
+        public void TakeDamage(int damage)
         {
             _currentHealth -= damage;
             healthChanged.Invoke(CurrentHealth);
 
             if (_currentHealth <= 0)
-                died?.Invoke();
+                _endGame.GameOver(this);
         }
 
         public void SpendForce(int value)
         {
             Force -= value;
             forceChanged?.Invoke(Force);
-            _actionsWithCards.DisableCards();
         }
 
         public void UpdateValues()
@@ -57,11 +57,20 @@ namespace CardGame.Core
             healthChanged?.Invoke(_currentHealth);
         }
 
+        public void AddForce(int addForce) 
+        {
+            Force += addForce;
+            if (Force > 10)
+                Force = 10;
+            UpdateValues();
+        }
+
         public void AppForce(int movenumber) 
         {
             Force += movenumber / 2 + movenumber % 2;
             if (Force > 10)
                 Force = 10;
+            UpdateValues();
         }
 
 

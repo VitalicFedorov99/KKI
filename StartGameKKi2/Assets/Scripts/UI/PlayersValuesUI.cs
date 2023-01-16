@@ -15,7 +15,7 @@ namespace UI
 
         private void Awake()
         {
-            _game.playerChanged.AddListener(OnPlayerChange);
+           // _game.playerChanged.AddListener(OnPlayerChange);
         }
 
         public void OnPlayerChange()

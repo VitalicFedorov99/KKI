@@ -7,42 +7,45 @@ using CardGame.Core;
 using CardGame.Cards.Base;
 using CardGame.Cards.Model;
 using CardGame.Ui;
+using CardGame.Cards.Effects;
+
 namespace CardGame.Field
 {
     public class GeneratorGameBoard : MonoBehaviour
     {
         [SerializeField] private GameObject _casing;
-        [SerializeField] private Transform _playerArea, _playerBoard, _playerDeck, _playerDump;
-        [SerializeField] private Transform _enemyArea, _enemyBoard, _enemyDeck, _enemyDump;
+        [SerializeField] public Transform _playerArea, _playerBoard, _playerDeck, _playerDump;
+        [SerializeField] public Transform _enemyArea, _enemyBoard, _enemyDeck, _enemyDump;
         [SerializeField] private Text _playerDeckCountText, _enemyDeckCountText;
         [SerializeField] private Image _imagePlayerHero, _imageEnemyHero;
         [SerializeField] private Transform _canvas;
-        [SerializeField] private GameObject _heroPlayer, _heroEnemy;
+        [SerializeField] private PlaceHero _heroPlayer, _heroEnemy;
         [SerializeField] private UpdaterPopap _popap;
         [SerializeField] private UiLineRender _lineRenderer;
         [SerializeField] private Card _prefabCard;
-        public UnityEvent<int, int> playerValuesGenerated;
-        public UnityEvent<int, int> enemyValuesGenerated;
+        [SerializeField] private PlaceHero _currentPlaceHero;
 
-        /*   public void Generate(Player current, Player enemy)
-           {
-               GenerateCards(current.InHandCards, _playerArea);
-               GenerateCards(current.InBoardCards, _playerBoard);
-               GenerateCards(enemy.InBoardCards, _enemyBoard);
-               GenerateCasing(enemy.InHandCards.Count, _enemyArea);
-               GenerateDeck(current.InDeckCardsCount, _playerDeck);
-               GenerateDeck(enemy.InDeckCardsCount, _enemyDeck);
-               GenerateDump(current.LastInDumpCard, _playerDump);
-               GenerateDump(enemy.LastInDumpCard, _enemyDump);
-               UpdateDeckCount(current.InDeckCardsCount, _playerDeckCountText);
-               UpdateDeckCount(enemy.InDeckCardsCount, _enemyDeckCountText);
 
-           }
-        */
+        [SerializeField] private Canvas _canvasChooseCard;
+        [SerializeField] private Transform _areaChooseCard;
+        [SerializeField] private ApplayEffect _applay;
+
+        public Transform GetAreaChooseCard() 
+        {
+            return _areaChooseCard;
+        }
+
+        public void SwitchAreaChooseCard(bool flag) 
+        {
+            _areaChooseCard.gameObject.SetActive(flag);
+        }
+      
         public void StartGame(ActionsWithCards current, ActionsWithCards enemy)
         {
             GenerateCards(current.AllModelCards, _playerDeck, current);
             GenerateCards(enemy.AllModelCards, _enemyDeck, enemy);
+
+
             for (int i = 0; i < 5; i++)
             {
                 CardFromDeckInHand(enemy, enemy, _enemyArea);
@@ -69,12 +72,30 @@ namespace CardGame.Field
             {
                 card.CloseCard();
             }
+            foreach (Card card in enemy._inDeckCards)
+            {
+                card.CloseCard();
+            }
+            foreach (Card card in current._inDeckCards)
+            {
+                card.CloseCard();
+            }
             UpdateDeckCount(current._inDeckCards.Count, _playerDeckCountText);
-
         }
 
 
-
+        public GameObject GetHero(PlayerType player) 
+        {
+            if (_heroPlayer.playerType == player) 
+            {
+                _currentPlaceHero = _heroPlayer;
+            }
+            if(_heroEnemy.playerType == player) 
+            {
+                _currentPlaceHero = _heroEnemy;
+            }
+            return _currentPlaceHero.gameObject;
+        }
 
         private void CardFromDeckInHand(ActionsWithCards who, ActionsWithCards whereFrom, Transform area)
         {
@@ -135,8 +156,11 @@ namespace CardGame.Field
             _imageEnemyHero.sprite = enemy.GetSpriteHero();
             _imagePlayerHero.sprite = player.GetSpriteHero();
 
-            player.GetComponent<PlayerActions>().SetEnemyObject(_heroEnemy);
-            enemy.GetComponent<PlayerActions>().SetEnemyObject(_heroPlayer);
+            _heroEnemy.playerType = enemy.GetComponent<Player>().PlayerType;
+            _heroPlayer.playerType = player.GetComponent<Player>().PlayerType;
+
+            player.GetComponent<PlayerActions>().SetEnemyObject(_heroEnemy.gameObject);
+            enemy.GetComponent<PlayerActions>().SetEnemyObject(_heroPlayer.gameObject);
 
         }
 
@@ -181,38 +205,27 @@ namespace CardGame.Field
         }
 
 
+        public Card ApplyEffect(Card card, Player player) 
+        {
+            if (Game.CurrentPlayer == player)
+            {
+                Twinner._instance.ApplyEffect(card.GetComponent<RectTransform>());
+            }
+            _applay.SetupEffect(card.GetEffect(), card);
+                return card;
+        }
+
         
 
         public Card CardInDump(Card card, Player player) 
         {
-            //Card newCard = Instantiate(card);
             if (Game.CurrentPlayer == player) 
             {
-                Debug.Log("Отбой");
-                //card.gameObject.SetActive(false);
-                //card.transform.SetParent(_canvas);
-                //var source = card.GetComponent<RectTransform>();
-                //Vector2 shiftDirection = source.anchorMin;
-                //source.anchoredPosition = shiftDirection * source.rect.size;
-                // Debug.Log("x: "+ card.GetComponent<RectTransform>().anchoredPosition.x + " y:" + card.GetComponent<RectTransform>().anchoredPosition.y);
-                //card.transform.position = _playerDump.transform.position;
-                //newCard.transform.position= _playerDump.transform.position;
-                //newCard.transform.SetParent(_playerDump);
-
                 Twinner._instance.CardMove(card.GetComponent<RectTransform>(), _playerDump.GetComponent<RectTransform>());
-                
-                Debug.Log("x: " + card.transform.position.x + " y:" + card.transform.position.y);
-              //  card.transform.SetParent(_playerDump);
-              //  card.gameObject.SetActive(false);
-                //Destroy(card.gameObject);
             }
             else 
             {
                 Twinner._instance.CardMove(card.GetComponent<RectTransform>(), _enemyDump.GetComponent<RectTransform>());
-                //card.transform.SetParent(_canvas);
-                //card.GetComponent<RectTransform>().anchoredPosition =  Vector2;
-                //card.transform.position = _enemyDump.transform.localPosition;
-                //card.transform.SetParent(_enemyDump);
             }
             return card;
         }
@@ -261,19 +274,23 @@ namespace CardGame.Field
         private void GenerateCards(List<ModelCard> models, Transform patent, ActionsWithCards player)
         {
             RemoveAllChild(patent);
-
+            int i = 0;
             foreach (var model in models)
             {
 
                 var card = Instantiate(_prefabCard);
+                card.name = player.name + " " + i;
                 card.transform.position = patent.transform.position;
                 card.transform.SetParent(patent);
                 card.Setup(player.GetPlayer(), model, _popap);
                 card.SetupLineRenderer(_lineRenderer);
                 card.TogelIsCanDrag(true);
                 player.AddCardInList(player._inDeckCards, card);
+                i++;
                 //card.gameObject.SetActive(true);
             }
+            player.CardDeckMix();
+
         }
 
 

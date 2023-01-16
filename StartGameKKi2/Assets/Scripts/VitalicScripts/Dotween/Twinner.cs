@@ -8,6 +8,7 @@ public class Twinner : MonoBehaviour
 
     [SerializeField] private TweenAttack _twinnerAttack;
     [SerializeField] private TweenGoInDump _tweenGoInDump;
+    [SerializeField] private TweenEffectCard _tweenEffectCard;
 
     private void Awake()
     {
@@ -25,6 +26,11 @@ public class Twinner : MonoBehaviour
      
         _twinnerAttack.Setup(obj1, obj2);
         _twinnerAttack.AttackInHero();
+    }
+
+    public void ApplyEffect(RectTransform card) 
+    {
+        _tweenEffectCard.Setup(card);
     }
 
 

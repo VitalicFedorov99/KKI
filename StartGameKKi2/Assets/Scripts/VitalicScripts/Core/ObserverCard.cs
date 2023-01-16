@@ -9,6 +9,8 @@ namespace CardGame.Core
         public static ObserverCard _instance;
         [SerializeField] private Unit _unitClic;
         [SerializeField] private Unit _unitPointEnter;
+        [SerializeField] private Card _currentCard;
+
 
         private void Awake()
         {
@@ -35,5 +37,15 @@ namespace CardGame.Core
             return _unitPointEnter;
         }
 
+
+        public void SetCurrentCard(Card card) 
+        {
+            _currentCard = card;
+        }
+
+        public Card GetCurrentCard() 
+        {
+            return _currentCard;
+        }
     }
 }

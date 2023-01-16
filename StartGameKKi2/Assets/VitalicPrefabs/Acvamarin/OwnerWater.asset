@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc7ad059ca59f84aaff1d9c0226556f, type: 3}
+  m_Name: OwnerWater
+  m_EditorClassIdentifier: 
+  Name: OwnerWater
+  Description: "\u043D\u0435 \u043C\u043E\u0436\u0435\u0442 \u0431\u044B\u0442\u044C
+    \u0437\u0430\u0431\u043B\u043E\u043A\u0438\u0440\u043E\u0432\u0430\u043D"
+  SpriteCard: {fileID: 21300000, guid: 13461b918db241940b167c1d8f0ece99, type: 3}
+  Price: 8
+  TypeCard: 1
+  Class: 2
+  ActionStart:
+    m_PersistentCalls:
+      m_Calls: []
+  ActionRegulary:
+    m_PersistentCalls:
+      m_Calls: []
+  ActionDead:
+    m_PersistentCalls:
+      m_Calls: []
+  ActionFight:
+    m_PersistentCalls:
+      m_Calls: []
+  Health: 8
+  Damage: 8
+  CountCell: 0
+  Cell: 0
+  IsEnemy: 0
+  IsBlocked: 0

@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using CardGame.Core;
-
+using CardGame.Cards.Effects;
 
 namespace CardGame.Cards.Base
 {
@@ -22,11 +22,17 @@ namespace CardGame.Cards.Base
         {
             _unit.SetStatus(Status.FirstTurn);
             _unit.statusChanged?.Invoke(_unit.Status);
-            if (isStart && _unit.GetStartEffect())
-                _unit.GetStartEffect().MakeStartEffect();
+
+            ApplayEffect.instance.SetupUnit(_unit, GetComponent<Card>());
+            // if (isStart && _unit.GetStartEffect())
+            //  _unit.GetStartEffect().MakeStartEffect();
+            _unit.UpdateCountCell();
+            
             Debug.Log($"{_unit.GetPlayer().name}: {_unit.Name} вступает в бой");
         }
 
+
+        
         public void ResetCard()
         {
             _unit.SetStatus(Status.NonBoard);
@@ -65,6 +71,8 @@ namespace CardGame.Cards.Base
             
         }
 
+
+       
         public void Dead() 
         {
             
@@ -93,6 +101,11 @@ namespace CardGame.Cards.Base
 
         public void OnPointerClick(PointerEventData eventData)
         {
+
+            if (_unit.Status == Status.FirstTurn && _unit.CountCell>0) 
+            {
+                ApplayEffect.instance.Apply();
+            }
             if (Game.CurrentPlayer == GetComponent<Card>().GetPlayer())
             {
                 if (Game.CurrentPlayer.CurrentPhase == Phase.Attack)
@@ -116,11 +129,11 @@ namespace CardGame.Cards.Base
                     }
                 }
             }
-            if(Game.CurrentPlayer!= GetComponent<Card>().GetPlayer()) 
+            if(Game.CurrentPlayer!= GetComponent<Card>().GetPlayer()&& !ApplayEffect.instance.IsActive()) 
             {
                 if(Game.CurrentPlayer.CurrentPhase == Phase.Defend) 
                 {
-                    if(_unit.Status == Status.Attacker) 
+                    if(_unit.Status == Status.Attacker && _unit.IsBlocked) 
                     {
                         Debug.LogError("Враг найден");
                         
@@ -144,11 +157,19 @@ namespace CardGame.Cards.Base
             }
         }
 
+
     
        
         public Unit GetUnit()
         {
             return _unit;
+        }
+        private void ApplayStartEffect() 
+        {
+            if (GetComponent<Card>().ActionStart != null) 
+            {
+                
+            }
         }
     }
 }

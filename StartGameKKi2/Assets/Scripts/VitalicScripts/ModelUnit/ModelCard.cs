@@ -19,7 +19,10 @@ namespace CardGame.Cards.Model
 
         public UnityEvent ActionStart;
 
+        public UnityEvent ActionRegulary;
         public UnityEvent ActionDead;
+
+        public UnityEvent ActionFight;
         public virtual void UpdateType()
         {
 

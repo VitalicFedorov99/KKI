@@ -27,7 +27,6 @@ public class UpdateForceHealthPanel : MonoBehaviour
     }
     public void UpdatePlayerForce(int force)
     {
-        Debug.Log("вызвался");
         _playerForce.text = force.ToString();
     }
 
